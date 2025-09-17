@@ -8,10 +8,4 @@ def variables():
     res1 = (bool_a or bool_b)
     res2 = (bool_a and bool_b)
     res3 = (not bool_a)
-    print(a)
-    print(b)
-    print(string)
-    print(res1)
-    print(res2)
-    print(res3)
-
+    return a, b, c, string, bool_a, bool_b, res1, res2, res3
