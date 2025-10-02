@@ -1,0 +1,162 @@
+<!-- bookings/templates/bookings/seat_booking.html -->
+{% extends 'bookings/base.html' %}
+
+{% block title %}Book Seat - {{ movie.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{% url 'movie_list' %}">Movies</a></li>
+                <li class="breadcrumb-item active">Book Seat</li>
+            </ol>
+        </nav>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3><i class="fas fa-couch me-2"></i>Select Your Seat</h3>
+            </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <div class="screen">
+                        <i class="fas fa-tv me-2"></i>SCREEN
+                    </div>
+                </div>
+                
+                <div class="seat-grid mb-4">
+                    {% for seat in seats %}
+                        <div class="seat available" data-seat-id="{{ seat.id }}" data-seat-number="{{ seat.seat_number }}">
+                            {{ seat.seat_number }}
+                        </div>
+                    {% endfor %}
+                </div>
+                
+                <div class="row text-center">
+                    <div class="col-4">
+                        <div class="seat available d-inline-block me-2" style="width: 30px; height: 30px; font-size: 12px;"></div>
+                        <small>Available</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="seat selected d-inline-block me-2" style="width: 30px; height: 30px; font-size: 12px;"></div>
+                        <small>Selected</small>
+                    </div>
+                    <div class="col-4">
+                        <div class="seat booked d-inline-block me-2" style="width: 30px; height: 30px; font-size: 12px;"></div>
+                        <small>Booked</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h4>{{ movie.title }}</h4>
+            </div>
+            <div class="card-body">
+                <p>{{ movie.description }}</p>
+                <hr>
+                <p><strong>Release Date:</strong> {{ movie.release_date }}</p>
+                <p><strong>Duration:</strong> {{ movie.duration }} minutes</p>
+                <hr>
+                <div id="booking-summary" style="display: none;">
+                    <h5>Booking Summary</h5>
+                    <p><strong>Selected Seat:</strong> <span id="selected-seat"></span></p>
+                    <button id="confirm-booking" class="btn btn-success w-100">
+                        <i class="fas fa-check me-2"></i>Confirm Booking
+                    </button>
+                </div>
+                <div id="no-selection">
+                    <p class="text-muted text-center">
+                        <i class="fas fa-arrow-left me-2"></i>Select a seat to continue
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const seats = document.querySelectorAll('.seat.available');
+    const bookingSummary = document.getElementById('booking-summary');
+    const noSelection = document.getElementById('no-selection');
+    const selectedSeatSpan = document.getElementById('selected-seat');
+    const confirmButton = document.getElementById('confirm-booking');
+    let selectedSeat = null;
+    
+    seats.forEach(seat => {
+        seat.addEventListener('click', function() {
+            // Remove previous selection
+            document.querySelectorAll('.seat.selected').forEach(s => {
+                s.classList.remove('selected');
+                s.classList.add('available');
+            });
+            
+            // Select current seat
+            this.classList.remove('available');
+            this.classList.add('selected');
+            selectedSeat = this;
+            
+            // Update UI
+            selectedSeatSpan.textContent = this.dataset.seatNumber;
+            bookingSummary.style.display = 'block';
+            noSelection.style.display = 'none';
+        });
+    });
+    
+    confirmButton.addEventListener('click', function() {
+        if (!selectedSeat) return;
+        
+        const seatId = selectedSeat.dataset.seatId;
+        const movieId = {{ movie.id }};
+        
+        // Make API call to book seat
+        fetch(`/api/api/seats/${seatId}/book/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ movie_id: movieId })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.id) {
+                alert('Booking confirmed successfully!');
+                window.location.href = "{% url 'booking_history' %}";
+            } else {
+                alert('Booking failed: ' + (data.error || JSON.stringify(data)));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Booking failed. Please try again.');
+        });
+    });
+    
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+</script>
+{% endblock %}
