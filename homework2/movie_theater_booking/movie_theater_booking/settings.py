@@ -9,6 +9,10 @@ INSTALLED_APPS = [
     'bookings',
 ]
 
+DEBUG = True  # For development only, set to False in production
+
+ALLOWED_HOSTS = ['*']  # Allows all hosts - useful for development or testing
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
