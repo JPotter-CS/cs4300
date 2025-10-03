@@ -9,7 +9,20 @@ INSTALLED_APPS = [
     'bookings',
 ]
 
+MIDDLEWARE = [
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+]
+
+ROOT_URLCONF = "movie_theater_booking.urls"
+
 DEBUG = True
+SECRET_KEY = '5-g%!t^z56mnj(o!$o6%n-k%2%^--h&$l^qh9k1841!(v0!e6#'
 
 ALLOWED_HOSTS = ['*']
 
@@ -41,12 +54,4 @@ TEMPLATES = [
     },
 ]
 
-MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-]
+STATIC_URL = '/static/'
