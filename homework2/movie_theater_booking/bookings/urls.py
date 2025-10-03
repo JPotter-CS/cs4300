@@ -8,8 +8,6 @@ router.register(r'seats', views.SeatViewSet)
 router.register(r'bookings', views.BookingViewSet, basename='booking')
 
 urlpatterns = [
-    # API URLs
-    path('api/', include(router.urls)),
     
     # Template URLs
     path('', views.movie_list, name='movie_list'),
