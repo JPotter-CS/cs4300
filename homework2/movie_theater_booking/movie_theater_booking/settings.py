@@ -66,5 +66,8 @@ DATABASES = {
     }
 }
 
+CSRF_TRUSTED_ORIGINS = [
+    'https://app-jpotter4-20.devedu.io',  # Your DevEdu app url here
+]
 
 STATIC_URL = '/static/'

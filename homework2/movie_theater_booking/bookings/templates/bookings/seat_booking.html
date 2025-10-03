@@ -120,7 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const movieId = "{{ movie.id }}";
 
             // Make API call to book seat
-            fetch(`/api/api/seats/${seatId}/book/`, {
+            fetch(`/api/seats/${seatId}/book/`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
