@@ -27,7 +27,6 @@
                         <i class="fas fa-tv me-2"></i>SCREEN
                     </div>
                 </div>
-                
                 <div class="seat-grid mb-4">
                     {% for seat in seats %}
                         <div class="seat available" data-seat-id="{{ seat.id }}" data-seat-number="{{ seat.seat_number }}">
@@ -35,7 +34,6 @@
                         </div>
                     {% endfor %}
                 </div>
-                
                 <div class="row text-center">
                     <div class="col-4">
                         <div class="seat available d-inline-block me-2" style="width: 30px; height: 30px; font-size: 12px;"></div>
@@ -53,7 +51,6 @@
             </div>
         </div>
     </div>
-    
     <div class="col-md-4">
         <div class="card">
             <div class="card-header">
@@ -92,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const selectedSeatSpan = document.getElementById('selected-seat');
     const confirmButton = document.getElementById('confirm-booking');
     let selectedSeat = null;
-    
+
     seats.forEach(seat => {
         seat.addEventListener('click', function() {
             // Remove previous selection
@@ -100,49 +97,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 s.classList.remove('selected');
                 s.classList.add('available');
             });
-            
+
             // Select current seat
             this.classList.remove('available');
             this.classList.add('selected');
             selectedSeat = this;
-            
+
             // Update UI
             selectedSeatSpan.textContent = this.dataset.seatNumber;
             bookingSummary.style.display = 'block';
             noSelection.style.display = 'none';
         });
     });
-    
-    confirmButton.addEventListener('click', function() {
-        if (!selectedSeat) return;
-        
-        const seatId = selectedSeat.dataset.seatId;
-        const movieId = {{ movie.id }};
-        
-        // Make API call to book seat
-        fetch(`/api/api/seats/${seatId}/book/`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': getCookie('csrftoken')
-            },
-            body: JSON.stringify({ movie_id: movieId })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.id) {
-                alert('Booking confirmed successfully!');
-                window.location.href = "{% url 'booking_history' %}";
-            } else {
-                alert('Booking failed: ' + (data.error || JSON.stringify(data)));
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Booking failed. Please try again.');
+
+    // Ensure confirmButton exists before adding event listener
+    if (confirmButton) {
+        confirmButton.addEventListener('click', function() {
+            if (!selectedSeat) return;
+
+            const seatId = selectedSeat.dataset.seatId;
+            // Always use quotes around Django variables in JS
+            const movieId = "{{ movie.id }}";
+
+            // Make API call to book seat
+            fetch(`/api/api/seats/${seatId}/book/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({ movie_id: movieId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.id) {
+                    alert('Booking confirmed successfully!');
+                    window.location.href = "{% url 'booking_history' %}";
+                } else {
+                    alert('Booking failed: ' + (data.error || JSON.stringify(data)));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Booking failed. Please try again.');
+            });
         });
-    });
-    
+    }
+
     function getCookie(name) {
         let cookieValue = null;
         if (document.cookie && document.cookie !== '') {

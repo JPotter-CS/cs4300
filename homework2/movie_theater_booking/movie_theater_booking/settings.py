@@ -9,9 +9,9 @@ INSTALLED_APPS = [
     'bookings',
 ]
 
-DEBUG = True  # For development only, set to False in production
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']  # Allows all hosts - useful for development or testing
+ALLOWED_HOSTS = ['*']
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
