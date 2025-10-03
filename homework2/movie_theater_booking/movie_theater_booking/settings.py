@@ -1,3 +1,6 @@
+import os
+from pathlib import Path
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -8,6 +11,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'bookings',
 ]
+
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
