@@ -8,11 +8,15 @@ from .serializers import MovieSerializer, SeatSerializer, BookingSerializer, Sea
 
 
 class MovieViewSet(viewsets.ModelViewSet):
+    # queryset selects all movies
     queryset = Movie.objects.all()
+    # Used to convert to/from JSON 
     serializer_class = MovieSerializer
-    permission_classes = [AllowAny]  # Allow public access to list and retrieve movies
+    # Allow public access for movies
+    permission_classes = [AllowAny]  
 
     @action(detail=True, methods=['get'])
+    # Returns all seats that are available for the movie
     def available_seats(self, request, pk=None):
         movie = self.get_object()
         available_seats = Seat.objects.filter(booking_status='available')
@@ -21,16 +25,21 @@ class MovieViewSet(viewsets.ModelViewSet):
 
 
 class SeatViewSet(viewsets.ModelViewSet):
+    # queryset selects all seats
     queryset = Seat.objects.all()
+    # Converts to/from JSON
     serializer_class = SeatSerializer
-    permission_classes = [AllowAny]  # Allow public access to list and retrieve seats
+    # Allow public access for seats
+    permission_classes = [AllowAny] 
 
+    # Returns seats with available status
     @action(detail=False, methods=['get'])
     def available(self, request):
         available_seats = Seat.objects.filter(booking_status='available')
         serializer = self.get_serializer(available_seats, many=True)
         return Response(serializer.data)
 
+    # Creates a booking if seat is available for the specific movie. This requires authentication (logged in)
     @action(detail=True, methods=['post'], permission_classes=[IsAuthenticated])
     def book(self, request, pk=None):
         seat = self.get_object()
@@ -54,14 +63,18 @@ class SeatViewSet(viewsets.ModelViewSet):
 
 class BookingViewSet(viewsets.ModelViewSet):
     serializer_class = BookingSerializer
-    permission_classes = [IsAuthenticated]  # Bookings require login
 
+    # Ensure bookings requires login
+    permission_classes = [IsAuthenticated]
+
+    # Gets bookings based on the logged in user
     def get_queryset(self):
         user = self.request.user
         if user.is_anonymous:
             return Booking.objects.none()
         return Booking.objects.filter(user=user)
 
+    # Returns a list of bookings from user
     @action(detail=False, methods=['get'])
     def history(self, request):
         bookings = self.get_queryset()
@@ -69,12 +82,13 @@ class BookingViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
 
-# Template views for UI
+# Gets all movies at displays as movie_list.html
 def movie_list(request):
     movies = Movie.objects.all()
     return render(request, 'bookings/movie_list.html', {'movies': movies})
 
-
+# Gets a specific movie by id or 404 
+# Gets all seats and displays at seat_bookings.html
 def seat_booking(request, movie_id):
     movie = get_object_or_404(Movie, id=movie_id)
     available_seats = Seat.objects.filter(booking_status='available')
@@ -83,7 +97,8 @@ def seat_booking(request, movie_id):
         'seats': available_seats
     })
 
-
+# List bookings for logged in user or none if not logged in
+# Get and displays at booking_history.html
 def booking_history(request):
     if request.user.is_authenticated:
         bookings = Booking.objects.filter(user=request.user)
