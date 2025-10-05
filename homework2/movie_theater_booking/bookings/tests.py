@@ -8,6 +8,7 @@ from .models import Movie, Seat, Booking
 
 class ModelUnitTests(TestCase):
     
+    # Set up func to create a user, movie, and available seat
     def setUp(self):
         """Set up test data for model tests"""
         self.user = User.objects.create_user(
@@ -26,16 +27,16 @@ class ModelUnitTests(TestCase):
             booking_status='available'
         )
 
+    # Test if the movie was create successfully
     def test_movie_model_creation(self):
-        """Test Movie model creation and string representation"""
         self.assertEqual(self.movie.title, 'Test Movie')
         self.assertEqual(self.movie.description, 'A test movie description')
         self.assertEqual(self.movie.duration, 120)
         self.assertEqual(self.movie.release_date, date.today())
         self.assertEqual(str(self.movie), 'Test Movie')
 
+    # tests if movie ordering is operating as it should
     def test_movie_model_ordering(self):
-        """Test Movie model ordering by release date"""
         earlier_movie = Movie.objects.create(
             title='Earlier Movie',
             description='Earlier movie',
@@ -46,15 +47,15 @@ class ModelUnitTests(TestCase):
         self.assertEqual(movies[0], earlier_movie) 
         self.assertEqual(movies[1], self.movie)
 
+    # Tests if the seat was created correctly
     def test_seat_model_creation(self):
-        """Test Seat model creation and string representation"""
         self.assertEqual(self.seat.seat_number, 'A1')
         self.assertEqual(self.seat.booking_status, 'available')
         self.assertEqual(str(self.seat), 'Seat A1 - available')
 
     def test_seat_model_choices(self):
         """Test Seat model status choices"""
-        # Test available status (default)
+        # Test available status
         self.assertEqual(self.seat.booking_status, 'available')
         
         # Test booked status
@@ -69,8 +70,8 @@ class ModelUnitTests(TestCase):
         self.seat.refresh_from_db()
         self.assertEqual(self.seat.booking_status, 'maintenance')
 
+    # Tests if booking is created correctly
     def test_booking_model_creation(self):
-        """Test Booking model creation and relationships"""
         booking = Booking.objects.create(
             movie=self.movie,
             seat=self.seat,
@@ -83,12 +84,12 @@ class ModelUnitTests(TestCase):
         self.assertEqual(booking.user, self.user)
         self.assertIsNotNone(booking.booking_date)
         
-        # Test string representation
+        # Test string return
         expected_str = f"{self.user.username} - {self.movie.title} - Seat {self.seat.seat_number}"
         self.assertEqual(str(booking), expected_str)
 
+    # Tests that a seat could not be double booked
     def test_booking_model_constraints(self):
-        """Test Booking model unique constraints"""
         # Create first booking
         booking1 = Booking.objects.create(
             movie=self.movie,
@@ -112,8 +113,8 @@ class ModelUnitTests(TestCase):
                 user=user2
             )
 
+    # Test if only the proper data can be stored in model vars
     def test_model_field_validations(self):
-        """Test model field validations"""
         # Test Movie duration is integer
         self.assertIsInstance(self.movie.duration, int)
         
@@ -125,7 +126,6 @@ class ModelUnitTests(TestCase):
             )
 
     def test_model_meta_options(self):
-        """Test model Meta options"""
         # Test Movie ordering
         movies = Movie.objects.all()
         if len(movies) > 1:
@@ -141,8 +141,8 @@ class ModelUnitTests(TestCase):
 
 class APIIntegrationTests(APITestCase):
     
+    # Sets up test data for API
     def setUp(self):
-        """Set up test data for API integration tests"""
         self.client = APIClient()
         self.user = User.objects.create_user(
             username='testuser',
@@ -160,8 +160,8 @@ class APIIntegrationTests(APITestCase):
             booking_status='available'
         )
 
+    # Testing API returns proper status codes
     def test_movie_list_api_status_code(self):
-        """Test movie list API returns correct status code"""
         # Try common URL patterns
         possible_urls = ['/api/movies/', '/api/api/movies/', '/movies/']
         
@@ -191,8 +191,8 @@ class APIIntegrationTests(APITestCase):
         if not success:
             self.skipTest("Could not find movie list API endpoint. Check URL configuration.")
 
+    # Test that api returns correct data format
     def test_movie_list_api_data_format(self):
-        """Test movie list API returns correct data format"""
         self.client.force_authenticate(user=self.user)
         
         # Try to find working URL
@@ -234,8 +234,8 @@ class APIIntegrationTests(APITestCase):
                 self.assertIn('duration', movie)
                 self.assertEqual(movie['title'], 'Integration Test Movie')
 
+    # Tests that API returns correct status codes
     def test_seat_list_api_status_code(self):
-        """Test seat list API returns correct status code"""
         possible_urls = ['/api/seats/', '/api/api/seats/', '/seats/']
         
         success = False
@@ -258,8 +258,8 @@ class APIIntegrationTests(APITestCase):
             except:
                 self.skipTest("Could not find seat list API endpoint")
 
+    # Ensures API returns correct data format
     def test_seat_available_api_data_format(self):
-        """Test available seats API returns correct data format"""
         self.client.force_authenticate(user=self.user)
         
         possible_urls = ['/api/seats/available/', '/api/api/seats/available/', '/seats/available/']
@@ -299,8 +299,8 @@ class APIIntegrationTests(APITestCase):
                 self.assertIn('booking_status', seat)
                 self.assertEqual(seat['booking_status'], 'available')
 
+    # Testing that makes sure booking API requires authentication
     def test_booking_api_authentication_required(self):
-        """Test booking API requires authentication"""
         possible_urls = ['/api/bookings/', '/api/api/bookings/', '/bookings/']
         
         found_endpoint = False
@@ -326,8 +326,8 @@ class APIIntegrationTests(APITestCase):
             except:
                 self.skipTest("Could not find booking API endpoint")
 
+    # Test that booking API works with authentication
     def test_booking_api_authenticated_access(self):
-        """Test booking API works with authentication"""
         self.client.force_authenticate(user=self.user)
         
         possible_urls = ['/api/bookings/', '/api/api/bookings/', '/bookings/']
@@ -363,8 +363,8 @@ class APIIntegrationTests(APITestCase):
             
             self.assertIsInstance(bookings_data, list)
 
+    # Ensures API returns JSON format
     def test_api_endpoints_return_json(self):
-        """Test that API endpoints return JSON format"""
         self.client.force_authenticate(user=self.user)
         
         # Test endpoints that should return JSON
@@ -391,8 +391,8 @@ class APIIntegrationTests(APITestCase):
                 # Check that data can be parsed as JSON
                 self.assertIsNotNone(response.data)
 
+    # Tests movie detail API status codes and proper format
     def test_movie_detail_api_status_and_format(self):
-        """Test movie detail API status code and data format"""
         self.client.force_authenticate(user=self.user)
         
         # Try different URL patterns
