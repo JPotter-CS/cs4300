@@ -44,5 +44,5 @@ TEST ARE LOCATED IN: cs4300/homework2/movie_theater_booking/bookings/tests.py
 URL: https://movie-theater-booking-9vf1.onrender.com/
 Admin Username: admin 
 Admin Password: admin123 
-Normal Username: johndoe
-Normal Paddword: johndoe123
+Normal Username: user
+Normal Paddword: user123
