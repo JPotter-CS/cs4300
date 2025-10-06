@@ -13,6 +13,7 @@ ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
     '.render.com',
+    'https://movie-theater-booking-9vf1.onrender.com/',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
