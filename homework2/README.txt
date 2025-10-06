@@ -37,6 +37,7 @@ TEST ARE LOCATED IN: cs4300/homework2/movie_theater_booking/bookings/tests.py
     - python manage.py test bookings.tests.ModelUnitTests (for only unit tests)
     - python manage.py test bookings.tests.APIIntegrationTests (For only integration tests)
     - # Run specific methods within tests file
+        - python manage.py test bookings.tests.ClassName.FunctionName
         - python manage.py test bookings.tests.ModelUnitTests.test_movie_model_creation
         - python manage.py test bookings.tests.APIIntegrationTests.test_movie_list_api_status_code
 
