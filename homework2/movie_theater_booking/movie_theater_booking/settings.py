@@ -6,8 +6,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'supa-secwet-key')
 
-
-DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
+DEBUG = 'True'
 
 ALLOWED_HOSTS = [
     'localhost',
@@ -97,10 +96,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-# Internationalization
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
-
 
 # Static files
 STATIC_URL = '/static/'

@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from datetime import date
 
 class Command(BaseCommand):
-
     def handle(self, *args, **kwargs):
         # Create sample movies
         Movie.objects.get_or_create(
