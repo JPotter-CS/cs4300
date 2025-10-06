@@ -12,12 +12,14 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() == 'true'
 ALLOWED_HOSTS = [
     'localhost',
     '127.0.0.1',
+    '.devedu.io',
     '.render.com',
     'movie-theater-booking-9vf1.onrender.com',
 ]
 
 CSRF_TRUSTED_ORIGINS = [
     'https://movie-theater-booking-9vf1.onrender.com', 
+    'https://app-jpotter4-20.devedu.io',
 ]
 
 # Application definition
